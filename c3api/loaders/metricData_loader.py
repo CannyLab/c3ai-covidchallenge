@@ -32,4 +32,16 @@ class MetricGroups:
         "JHU_ConfirmedRecoveriesInterpolated",
     ]
 
-    
+    MOBILITY_GROUPS = [
+        "Apple_DrivingMobility",
+        "Apple_WalkingMobility",
+        "Apple_TransitMobility",
+        "Google_GroceryMobility",
+        "Google_ParksMobility",
+        "Google_TransitStationsMobility",
+        "Google_RetailMobility",
+        "Google_ResidentialMobility",
+        "Google_WorkplacesMobility",
+
+    ]
+
