@@ -45,14 +45,15 @@ def fetch(typename, body, get_all = False, remove_meta = True):
         while has_more:
             body['spec'].update(limit = limit, offset = offset)
             response_json = read_data_json(typename, 'fetch', body)
-            new_df = pd.json_normalize(response_json['objs'])
+            new_df = pd.io.json.json_normalize(response_json['objs'])
             df = df.append(new_df)
             has_more = response_json['hasMore']
             offset += limit
             
     else:
         response_json = read_data_json(typename, 'fetch', body)
-        df = pd.json_normalize(response_json['objs'])
+        print(response_json)
+        df = pd.io.json.json_normalize(response_json['objs'])
         
     if remove_meta:
         df = df.drop(columns = [c for c in df.columns if ('meta' in c) | ('version' in c)])
@@ -81,13 +82,13 @@ def evalmetrics(typename, body, get_all = False, remove_meta = True):
                     expressions = expressions[expressions_start : expressions_start + 4]
                 )
                 response_json = read_data_json(typename, 'evalmetrics', body)
-                new_df = pd.json_normalize(response_json['result'])
+                new_df = pd.io.json.json_normalize(response_json['result'])
                 new_df = new_df.apply(pd.Series.explode)
                 df = pd.concat([df, new_df], axis = 1)
             
     else:
         response_json = read_data_json(typename, 'evalmetrics', body)
-        df = pd.json_normalize(response_json['result'])
+        df = pd.io.json.json_normalize(response_json['result'])
         df = df.apply(pd.Series.explode)
 
     # get the useful data out
@@ -110,7 +111,7 @@ def getprojectionhistory(body, remove_meta = True):
     remove_meta: If True, remove metadata about each record. If False, include it. The default is True.
     """  
     response_json = read_data_json("outbreaklocation", 'getprojectionhistory', body)
-    df = pd.json_normalize(response_json)
+    df = pd.io.json.json_normalize(response_json)
     df = df.apply(pd.Series.explode)
 
     # get the useful data out
