@@ -17,7 +17,7 @@ class GeneralDataLoader(Loader):
 
         Args:
             location (str): Location ID (i.e. "UnitedStates" or "Alameda_California_UnitedStates")
-            include_fields (List): List of fields to return (reference API)
+            include_fields (List): List of fields to return (reference API) parameter is a powerful way to fetch data from multiple C3.ai Types
             limit (int, optional): [description]. Max Limit of rows
 
         Returns:
