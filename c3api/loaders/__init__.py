@@ -1,4 +1,4 @@
 
-from .metricData_loader import MetricDataLoader, MetricGroups
-from .generalData_loader import GeneralDataLoader
+from .MetricDataLoader import MetricDataLoader, MetricGroups
+from .GeneralDataLoader import GeneralDataLoader
 from .loader import Loader
