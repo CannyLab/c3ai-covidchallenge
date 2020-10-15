@@ -13,7 +13,6 @@ def get_counties_query():
 	counties_time_intervals = []
 	ids = list(counties['id'].values)
 	for i in range(counties.shape[0] // 10):
-		if i == 3: break;
 		counties_time = c3aidatalake.evalmetrics(
 			"outbreaklocation",
 			{
