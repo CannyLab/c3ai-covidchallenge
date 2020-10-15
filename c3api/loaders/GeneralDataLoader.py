@@ -5,13 +5,21 @@ from typing import List
 
 from c3api.loaders.loader import Loader
 
+"""
+DEPRACATED... USE ONLY IN NECESSARY CIRCUMSTANCES
+"""
+
 class GeneralDataLoader(Loader):
 
     def __init__(self,):
         super(GeneralDataLoader, self).__init__(None, None)
 
 
-    def fetch(self, location: str, include_fields: List, limit: int = None) -> pd.DataFrame:
+    def fetch(self, 
+              location: str, 
+              include_fields: List, 
+              limit: int = None
+            ) -> pd.DataFrame:
         """
         Fetch General Data about various locations supported by the C3 API
 
@@ -31,7 +39,7 @@ class GeneralDataLoader(Loader):
         }
 
         if len(include_fields) > 0:
-            spec["include"] = include_fields
+            spec["include"] = ", ".join(include_fields)
         
         if limit:
             spec["limit"] = limit
