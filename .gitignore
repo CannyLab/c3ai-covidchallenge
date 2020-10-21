@@ -3,6 +3,9 @@ include/
 share/
 lib/
 
+.ipynb_checkpoints/
+*.txt
+
 c3api.egg-info/
 
 __pycache__
