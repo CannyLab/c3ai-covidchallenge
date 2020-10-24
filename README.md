@@ -6,3 +6,8 @@ All interactions with the c3aidatalake happens with post requests that return js
 1. Types
 2. 
 
+## MSG for Illian
+
+in the "C3AIPlayground" notebook, run the first cell and then every cell starting from:
+ 
+from c3api import c3aidatalake
