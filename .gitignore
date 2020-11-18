@@ -3,6 +3,11 @@ include/
 share/
 lib/
 
+etc/
+*.csv
+*.xls
+*.xlsx
+
 .ipynb_checkpoints/
 *.txt
 
