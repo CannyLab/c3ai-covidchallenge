@@ -3,7 +3,14 @@ import numpy as np
 from tqdm import tqdm 
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
-
+from sklearn.model_selection import train_test_split
+# class Causality:
+#     def __init__(self, 
+#                  X,
+#                  Y,
+#                  ):
+#         self.X = X
+#         self.Y = Y
 # class AutoRegressiveModel:
 #     def __init__(self, coefficents)
 
@@ -106,8 +113,50 @@ class GrangerCausalityTest:
    
 
 
-def feature_importance_test():
-    pass
+class FeatureImportance:
+    def __init__(self, 
+                 clf,
+                 X: pd.DataFrame, 
+                 Y: pd.DataFrame,
+                 scalar = None
+                 ):
+        self.clf = clf
+        self.X_train,self.X_test, self.Y_train, self.Y_test  = train_test_split(X.to_numpy(),Y.to_numpy())
+        if scalar:
+            self.scalar = scalar
+            self.X_train = scalar.fit_transform(self.X_train)
+            self.X_test = scalar.transform(self.X_test)
+        self.num_features = self.X_train.shape[1]
+        
+    def fit(self):
+        self.clf.fit(self.X_train,self.Y_train)
+    
+    def permuted_accuracy(self, i, X, Y):
+        X_perm = X.copy()
+        feature = X_perm[:, i]
+        feature = np.random.choice(feature, size=len(feature))
+        X_perm[:, i] = feature
+        Y_perm_pred = self.clf.predict(X_perm)
+        accuracy = np.count_nonzero(Y_perm_pred == Y) / len(Y) 
+        return accuracy
+
+    def _feature_importance(self, ith_feature,accuracy, test=True):
+        X, Y = self.X_test, self.Y_test if test else self.X_train, self.Y_train
+        accuracy_perm = self.permuted_accuracy(ith_feature, X, Y)
+        feature_importance = (1 - accuracy_perm) / accuracy
+        return {f"FI_{ith_feature}":feature_importance, 
+                "accuracy_perm": accuracy_perm
+                }
+
+    def feature_importance_test(self, test=True):
+        X, Y = self.X_test, self.Y_test if test else self.X_train, self.Y_train
+        accuracy = np.count_nonzero(self.clf.predict(X) == Y)
+        fi_tests = {'accuracy':accuracy}
+        for i in range(self.num_features):
+            if i == 4: break
+            fi_tests[i] = self._feature_importance(i,accuracy, test=test)
+        return fi_tests
+        
 
 def derivative_test():
     pass
