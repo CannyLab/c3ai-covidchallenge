@@ -38,7 +38,7 @@ install_requirements = [
         "notebook==6.1.5",
         "numpy==1.19.4",
         "packaging==20.4",
-        "pandas==1.1.4",
+        "pandas==1.1.5",
         "pandocfilters==1.4.3",
         "parso==0.7.1",
         "pexpect==4.8.0",
@@ -66,7 +66,7 @@ install_requirements = [
         "testpath==0.4.4",
         "threadpoolctl==2.1.0",
         "tornado==6.1",
-        "tqdm==4.52.0",
+        "tqdm==4.36.1",
         "traitlets==4.3.3",
         "wcwidth==0.2.5",
         "webencodings==0.5.1",
@@ -75,7 +75,7 @@ install_requirements = [
         "zipp==3.4.0",
 ]
 setup(
-        name='c3api',
+        name='covid_activity',
         install_requires=install_requirements,
         version='1.0.0',
         packages=['covid_activity'],
