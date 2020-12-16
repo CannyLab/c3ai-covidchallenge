@@ -141,15 +141,15 @@ class FeatureImportance:
         return accuracy
 
     def _feature_importance(self, ith_feature,accuracy, test=True):
-        X, Y = self.X_test, self.Y_test if test else self.X_train, self.Y_train
+        X, Y = (self.X_test, self.Y_test) if test else (self.X_train, self.Y_train)
         accuracy_perm = self.permuted_accuracy(ith_feature, X, Y)
-        feature_importance = (1 - accuracy_perm) / accuracy
+        feature_importance = (1 - accuracy_perm + 1e-8) / (1- accuracy + 1e-8)
         return {f"FI_{ith_feature}":feature_importance, 
                 "accuracy_perm": accuracy_perm
                 }
 
     def feature_importance_test(self, test=True):
-        X, Y = self.X_test, self.Y_test if test else self.X_train, self.Y_train
+        X, Y = (self.X_test, self.Y_test) if test else (self.X_train, self.Y_train)
         accuracy = np.count_nonzero(self.clf.predict(X) == Y)
         fi_tests = {'accuracy':accuracy}
         for i in range(self.num_features):

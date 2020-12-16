@@ -4,7 +4,7 @@ from covid_activity.references import DATASET_DIR, cols
 import os
 from sklearn.neural_network import MLPRegressor
 from sklearn.preprocessing import StandardScaler as Scalar
-
+import pickle
 import json
 
 if __name__ == '__main__':
@@ -36,3 +36,8 @@ if __name__ == '__main__':
     
     with open(os.path.join(DATASET_DIR, 'feature_importance_test.json'), 'w', encoding='utf-8') as f:
         json.dump(fi_test, f, indent=4)
+
+    with open(os.path.join(DATASET_DIR, 'feature_importance_model.pickle'), 'w', encoding='utf-8') as f:
+        s = pickle.dump(clf, f)
+    
+
