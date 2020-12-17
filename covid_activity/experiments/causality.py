@@ -151,7 +151,7 @@ class FeatureImportance:
 
     def feature_importance_test(self, test=True):
         X, Y = (self.X_test, self.Y_test) if test else (self.X_train, self.Y_train)
-        accuracy = np.count_nonzero(self.model.predict(X) == Y)
+        accuracy = np.count_nonzero(np.self.model.predict(X) == Y)
         fi_tests = {'accuracy':accuracy}
         for i in range(self.num_features):
             fi_tests[i] = self._feature_importance(i,accuracy, test=test)

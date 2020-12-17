@@ -13,20 +13,20 @@ if __name__ == '__main__':
     cccpaap_masked = compute_diffs(cccpaap_masked)
     
   
-    clf = MLPRegressor(hidden_layer_sizes=(100, 100, 100))
+    reg = MLPRegressor(hidden_layer_sizes=(100, 100, 100))
     scalar = Scalar()
     
     X = cccpaap_masked[cols]
     Y = cccpaap_masked['daily_growth_rate']
     
     FI_test = FeatureImportance(
-        clf = clf,
+        model = reg,
         X = X, 
         Y = Y,
         scalar = scalar 
     )
     
-    print(f"fitting clf {clf}")
+    print(f"fitting reg {reg}")
     FI_test.fit()
     print("Running feature_importance test")
     fi_train = FI_test.feature_importance_test(test=False)
@@ -38,6 +38,6 @@ if __name__ == '__main__':
         json.dump(fi_test, f, indent=4)
 
     with open(os.path.join(DATASET_DIR, 'feature_importance_model.pickle'), 'wb') as f:
-        s = pickle.dump(clf, f)
+        s = pickle.dump(reg, f)
     
 
