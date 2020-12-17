@@ -32,6 +32,33 @@ class CountyActivity:
     self.activities = activities_by_county(self.data, county_name, sector_ranges)
     return self.activities
   
+  def _get_county_fips(self, use_cached=True):
+    if use_cached and 'fips' in self.data:
+      return self.data[['County FIPS','State FIPS', 'State', 'county', 'fips']].drop_duplicates().reset_index(drop=True)
+    fips_to_state = self.data[['County FIPS','State FIPS', 'State', 'county']]
+    leading_zero = leading_zero_creator(n=2)
+    fips_to_state['fips'] = (fips_to_state['State FIPS'].apply(leading_zero))
+    leading_zero = leading_zero_creator(n=3)
+    fips_to_state['fips'] = fips_to_state['fips']  + fips_to_state['County FIPS'].apply(leading_zero)
+    self.data['fips'] = fips_to_state['fips']
+    return self.data[['County FIPS','State FIPS', 'State', 'county', 'fips']].drop_duplicates().reset_index(drop=True)
+
+def remove_period(string):
+    try:
+        string = str(int(string))
+        return string.replace('.', '')
+    except:
+        return ""
+def leading_zero_creator(n):
+  def func(v):
+    try:
+        string = remove_period(v)
+        if len(string) < n:
+            return '0' * (n-len(string)) + string
+        return string
+    except:
+        return ""
+  return func
     
 
 def _get_rid_of_dashes(v):

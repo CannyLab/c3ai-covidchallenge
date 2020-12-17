@@ -123,6 +123,8 @@ class FeatureImportance:
         np.random.seed(555)
         self.model = model
         self.X_train,self.X_test, self.Y_train, self.Y_test  = train_test_split(X.to_numpy(),Y.to_numpy())
+        self.Y_train = np.sign(self.Y_train)
+        self.Y_test = np.sign(self.Y_test)
         if scalar:
             self.scalar = scalar
             self.X_train = scalar.fit_transform(self.X_train)
@@ -151,7 +153,7 @@ class FeatureImportance:
 
     def feature_importance_test(self, test=True):
         X, Y = (self.X_test, self.Y_test) if test else (self.X_train, self.Y_train)
-        accuracy = np.count_nonzero(np.isclose(self.model.predict(X), .01))
+        accuracy = np.count_nonzero(self.model.predict(X) == Y)
         fi_tests = {'accuracy':accuracy}
         for i in range(self.num_features):
             fi_tests[i] = self._feature_importance(i,accuracy, test=test)

@@ -2,7 +2,7 @@ from covid_activity.dataset.dataset_constructor import CountyDataLake, compute_d
 from covid_activity.experiments.causality import FeatureImportance
 from covid_activity.references import DATASET_DIR, cols
 import os
-from sklearn.neural_network import MLPRegressor
+from sklearn.neural_network import MLPClassifier
 from sklearn.preprocessing import StandardScaler as Scalar
 import pickle
 import json
@@ -13,21 +13,23 @@ if __name__ == '__main__':
     cccpaap_masked = compute_diffs(cccpaap_masked)
     
   
-    reg = MLPRegressor(hidden_layer_sizes=(100, 100, 100))
+    model = MLPClassifier(hidden_layer_sizes=(100, 100, 100))
     scalar = Scalar()
     
     X = cccpaap_masked[cols]
     Y = cccpaap_masked['daily_growth_rate']
     
     FI_test = FeatureImportance(
-        model = reg,
+        model = model,
         X = X, 
         Y = Y,
         scalar = scalar 
     )
     
-    print(f"fitting reg {reg}")
+    print(f"fitting reg {model}")
     FI_test.fit()
+    with open(os.path.join(DATASET_DIR, 'feature_importance_model.pickle'), 'wb') as f:
+        s = pickle.dump(model, f)
     print("Running feature_importance test")
     fi_train = FI_test.feature_importance_test(test=False)
     fi_test = FI_test.feature_importance_test(test=True)
@@ -36,8 +38,5 @@ if __name__ == '__main__':
     
     with open(os.path.join(DATASET_DIR, 'feature_importance_test.json'), 'w', encoding='utf-8') as f:
         json.dump(fi_test, f, indent=4)
-
-    with open(os.path.join(DATASET_DIR, 'feature_importance_model.pickle'), 'wb') as f:
-        s = pickle.dump(reg, f)
     
 
