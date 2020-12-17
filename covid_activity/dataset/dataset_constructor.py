@@ -85,9 +85,11 @@ class C3aiDataLake:
                county_path = 'counties.csv',
                case_count_path = 'county_case_counts.csv',
                merged_path = 'county_case_counts_pop.csv',
+               death_count_path = 'death_counts.csv',
                ):
     self.county_path = os.path.join(DATASET_DIR, county_path)
     self.case_count_path = os.path.join(DATASET_DIR, case_count_path)
+    self.death_count_path = os.path.join(DATASET_DIR, death_count_path)
     self.merged_path = os.path.join(DATASET_DIR, merged_path)
     
     assert os.path.exists(self.county_path), f'{self.county_path} Does not exist. Download data first.'
@@ -95,6 +97,7 @@ class C3aiDataLake:
     
     self.counties = None
     self.case_counts = None
+    self.death_counts = None
     self.population = None
     self.merged = None
     
@@ -106,6 +109,7 @@ class C3aiDataLake:
     self.get_county_case_counts()
     self.get_county_population()
     self.get_county_case_counts_pop()
+    self.get_county_death_counts()
 
   def _county_names(self):
     return self.merged['county'].values
@@ -128,6 +132,16 @@ class C3aiDataLake:
     self.case_counts = self.case_counts.loc[:, ['county', *self.case_counts.columns[:-1]]]
     return self.case_counts
   
+  def get_county_death_counts(self, use_cached=True):
+    if use_cached and self.death_counts is not None:
+      return self.death_counts
+    self.death_counts = pd.read_csv(self.death_count_path)
+    indicies =self.death_counts.transpose().reset_index().apply(data_in_index, axis=1)
+    self.death_counts = self.death_counts.transpose()[indicies.values.reshape(-1)].reset_index()
+    self.death_counts['county'] = self.death_counts['index'].apply(lambda string: re.sub('\.JHU_ConfirmedDeaths\.data', "", string))
+    self.death_counts = self.death_counts.drop(['index'], axis=1)
+    self.death_counts = self.death_counts.loc[:, ['county', *self.death_counts.columns[:-1]]]
+  
   def get_county_population(self, use_cached=True):
     if use_cached and self.population is not None:
       return self.population
@@ -138,18 +152,25 @@ class C3aiDataLake:
   def get_county_case_counts_pop(self, use_cached=True):
     if use_cached and self.merged is not None:
       return self.merged
-    if os.path.exists(self.merged_path):
+    
+    if use_cached and os.path.exists(self.merged_path):
       self.merged = pd.read_csv(self.merged_path)
       return self.merged
     print('merging counties, population, and case counts')
     self.merged = pd.DataFrame(list(zip(
                     self.counties['county'].values,
                     self.population['population'].values, 
-                    self.case_counts.values
+                    self.case_counts.drop('county', axis=1).values,
                     )))
-    self.merged = self.merged.explode(2).drop_duplicates().fillna(0)
-    self.merged.columns = ['county', 'population', 'cases']
-    self.merged.to_csv(self.merged_path)
+    self.merged = self.merged.explode(2) # can only explode a single column not multiple
+    self.merged[3] = pd.DataFrame(list(zip(
+                      self.counties['county'].values,
+                      self.population['population'].values, 
+                      self.death_counts.drop('county', axis=1).values,
+                    ))).explode(2)[2][:self.merged.shape[0]].values
+    self.merged.columns = ['county', 'population', 'cases', 'deaths']
+    #self.merged['death_counts'] = self.death_counts.values[:self.merged.shape[0]]
+    #self.merged.to_csv(self.merged_path)
     return self.merged
 
                                                       

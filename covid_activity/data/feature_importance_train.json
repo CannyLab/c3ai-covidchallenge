@@ -1,0 +1,19 @@
+{
+    "accuracy": 0,
+    "0": {
+        "FI_0": 1.0,
+        "accuracy_perm": 0.0
+    },
+    "1": {
+        "FI_1": 1.0,
+        "accuracy_perm": 0.0
+    },
+    "2": {
+        "FI_2": 1.0,
+        "accuracy_perm": 0.0
+    },
+    "3": {
+        "FI_3": 1.0,
+        "accuracy_perm": 0.0
+    }
+}

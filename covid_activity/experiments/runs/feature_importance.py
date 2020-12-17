@@ -37,7 +37,7 @@ if __name__ == '__main__':
     with open(os.path.join(DATASET_DIR, 'feature_importance_test.json'), 'w', encoding='utf-8') as f:
         json.dump(fi_test, f, indent=4)
 
-    with open(os.path.join(DATASET_DIR, 'feature_importance_model.pickle'), 'w', encoding='utf-8') as f:
+    with open(os.path.join(DATASET_DIR, 'feature_importance_model.pickle'), 'wb') as f:
         s = pickle.dump(clf, f)
     
 

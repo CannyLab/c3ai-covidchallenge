@@ -69,6 +69,28 @@ def download_county_case_count(counties_path: str = os.path.join(DATASET_DIR, 'c
     all_counties_cases = pd.concat(all_counties_time, axis=1)
     return all_counties_cases
 
+def download_deaths(counties_path: str = os.path.join(DATASET_DIR, 'counties_deaths.csv'), source_dataset="JHU_ConfirmedDeaths"):
+    counties = pd.read_csv(counties_path)
+    today = pd.Timestamp.now().strftime("%Y-%m-%d")
+    all_counties_time = []
+    ids = list(counties['id'].values)
+    for i in tqdm(range(counties.shape[0] // 10), total=counties.shape[0] // 10):
+        counties_time = c3aidatalake.evalmetrics(
+            "outbreaklocation",
+            {
+                "spec" : {
+                    "ids": ids[i * 10: i * 10 + 10],
+                    "expressions" : [source_dataset],
+                    "start" : "2020-01-01",
+                    "end" : today,
+                    "interval" : "DAY",
+                }
+            }
+        )
+        all_counties_time +=[counties_time]
+    all_counties_cases = pd.concat(all_counties_time, axis=1)
+    return all_counties_cases
+
 def download_county_policy_data(root_dir=DATASET_DIR):
     '''download_policy_data 
     downloads policy data from healthdata
