@@ -13,16 +13,14 @@ if __name__ == '__main__':
     cccpaap_masked = dlake.get_county_case_counts_pop_activity_landarea_policy()
     cccpaap_masked = compute_diffs(cccpaap_masked)
     
-  
+    os.mkdir(os.path.join(DATASET_DIR, '/models/'))
 
     panel_exp = {}
     models = {}
     for county_name in tqdm(set(cccpaap_masked['county'].values)):
         county = cccpaap_masked[cccpaap_masked['county'] == county_name]
         X = county[
-        cols + [
-            'start_stop',
-            ]
+        cols
         ]
         Y = county['daily_growth_rate']
         
@@ -45,14 +43,12 @@ if __name__ == '__main__':
                 'train': fi_train, 
                 'test': fi_test, 
             }
-        models[county_name] = {
-            pickle.dumps(model)
-        }
+        with open(os.path.join(DATASET_DIR, '/models/', 'feature_importance_test.json'), 'wb') as f:
+            json.dump(model, f)
     
-        with open(os.path.join(DATASET_DIR, 'feature_importance_panel_exp.json'), 'w', encoding='utf-8') as f:
-            json.dump(panel_exp, f, indent=4)
-        
-        with open(os.path.join(DATASET_DIR, 'feature_importance_test.json'), 'wb') as f:
-            json.dump(models, f)
+    with open(os.path.join(DATASET_DIR, 'feature_importance_panel_exp.json'), 'w', encoding='utf-8') as f:
+        json.dump(panel_exp, f, indent=4)
+    
+  
     
 
