@@ -36,7 +36,7 @@ def growth_rate_experiment(Y_value='cases'):
     with open(os.path.join(DATASET_DIR, f'{Y_value}_full_policy_model.json'), 'w', encoding='utf-8') as f:
         json.dump(panel_exp, f, indent=4)
         
-    combined_panel_experiment(panel_exp, Y_value)
+    #combined_panel_experiment(panel_exp, Y_value)
  
 #  def combined_panel_experiment(panel_exp, Y_value):
 #     # compute the country model weighted by population density
