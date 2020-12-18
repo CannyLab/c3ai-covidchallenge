@@ -123,11 +123,11 @@ class FeatureImportance:
                  ):
         np.random.seed(555)
         
-        X_dfs = []
-        for lag in range(y_lag):
+        X_dfs = [X]
+        for lag in range(1, y_lag):
             X_dfs.append(Y.shift(lag))
         X = pd.concat(X_dfs, axis=1).iloc[y_lag:, :]
-        Y = Y.iloc[y_lag:, :]
+        Y = Y.iloc[y_lag:]
         
         self.model = model
         self.X_train,self.X_test, self.Y_train, self.Y_test  = train_test_split(X.to_numpy(),Y.to_numpy())

@@ -566,16 +566,16 @@ def has_listed_activities(row):
   return False
 
 
-def compute_diffs(dataframe, Y_value='cases'):
+def compute_diffs(dataframe, col_name="", Y_value='cases'):
     APPROX_NEG_INFTY=-1e2
-    APPROX_POS_INFTY=1e2
+    APPROX_POS_INFTY= 1e2
     # create deltas
     # can't do this b/c we're computing spurious deltas b/w counties
-    dataframe['daily_change'] = np.zeros(dataframe.shape[0])
-    dataframe['daily_change'].iloc[1:] = dataframe[Y_value].values[1:] - dataframe[Y_value].values[:-1]
-    dataframe['daily_change'] = dataframe['daily_change'].fillna(0)
-    dataframe['daily_growth_rate'] = np.zeros(dataframe.shape[0])
-    dataframe['daily_growth_rate'].iloc[1:] = (dataframe[Y_value].apply(lambda v: 1e-3 if v == 0.0 else v).values[1:] / dataframe[Y_value].apply(lambda v: 1e-3 if v == 0.0 else v).values[:-1])
-    dataframe['daily_growth_rate'] = dataframe['daily_growth_rate'].apply(lambda v: 1e-3 if v == 0.0 else v).apply(np.log)
+    dataframe[f'{col_name}daily_change'] = np.zeros(dataframe.shape[0])
+    dataframe[f'{col_name}daily_change'].iloc[1:] = dataframe[Y_value].values[1:] - dataframe[Y_value].values[:-1]
+    dataframe[f'{col_name}daily_change'] = dataframe[f'{col_name}daily_change'].fillna(0)
+    dataframe[f'{col_name}daily_growth_rate'] = np.zeros(dataframe.shape[0])
+    dataframe[f'{col_name}daily_growth_rate'].iloc[1:] = (dataframe[Y_value].apply(lambda v: 1e-3 if v == 0.0 else v).values[1:] / dataframe[Y_value].apply(lambda v: 1e-3 if v == 0.0 else v).values[:-1])
+    dataframe[f'{col_name}daily_growth_rate'] = dataframe[f'{col_name}daily_growth_rate'].apply(lambda v: 1e-3 if v == 0.0 else v).apply(np.log)
     return dataframe
 
