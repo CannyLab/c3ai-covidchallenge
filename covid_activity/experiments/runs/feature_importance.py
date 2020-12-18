@@ -16,7 +16,11 @@ if __name__ == '__main__':
     model = MLPClassifier(hidden_layer_sizes=(100, 100, 100))
     scalar = Scalar()
     
-    X = cccpaap_masked[cols]
+    X = cccpaap_masked[
+        cols + [
+            'start_stop',
+            ]
+        ]
     Y = cccpaap_masked['daily_growth_rate']
     
     FI_test = FeatureImportance(

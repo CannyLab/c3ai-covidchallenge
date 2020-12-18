@@ -118,11 +118,22 @@ class FeatureImportance:
                  model,
                  X: pd.DataFrame, 
                  Y: pd.DataFrame,
-                 scalar = None
+                 scalar = None,
+                 y_lag=5
                  ):
         np.random.seed(555)
+        
+        X_dfs = []
+        for lag in range(y_lag):
+            X_dfs.append(Y.shift(lag))
+        X = pd.concat(X_dfs, axis=1).iloc[y_lag:, :]
+        Y = Y.iloc[y_lag:, :]
+        
         self.model = model
         self.X_train,self.X_test, self.Y_train, self.Y_test  = train_test_split(X.to_numpy(),Y.to_numpy())
+        
+
+        
         self.Y_train = np.sign(self.Y_train)
         self.Y_test = np.sign(self.Y_test)
         if scalar:
@@ -153,10 +164,10 @@ class FeatureImportance:
 
     def feature_importance_test(self, test=True):
         X, Y = (self.X_test, self.Y_test) if test else (self.X_train, self.Y_train)
-        accuracy = np.count_nonzero(self.model.predict(X) == Y)
+        accuracy = np.count_nonzero(self.model.predict(X) == Y) / len(Y)
         fi_tests = {'accuracy':accuracy}
         for i in range(self.num_features):
-            fi_tests[i] = self._feature_importance(i,accuracy, test=test)
+            fi_tests[i] = self._feature_importance(i, accuracy, test=test)
         return fi_tests
         
 

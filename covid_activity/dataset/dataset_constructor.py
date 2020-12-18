@@ -168,6 +168,7 @@ class C3aiDataLake:
     self.death_counts['county'] = self.death_counts['index'].apply(lambda string: re.sub('\.JHU_ConfirmedDeaths\.data', "", string))
     self.death_counts = self.death_counts.drop(['index'], axis=1)
     self.death_counts = self.death_counts.loc[:, ['county', *self.death_counts.columns[:-1]]]
+    return self.death_counts
   
   def get_county_population(self, use_cached=True):
     if use_cached and self.population is not None:
@@ -181,6 +182,7 @@ class C3aiDataLake:
       return self.merged
     
     if use_cached and os.path.exists(self.merged_path):
+      #print(self.merged_path)
       self.merged = pd.read_csv(self.merged_path)
       return self.merged
     print('merging counties, population, and case counts')
@@ -195,7 +197,7 @@ class C3aiDataLake:
                       self.population['population'].values, 
                       self.death_counts.drop('county', axis=1).values,
                     ))).explode(2)[2][:self.merged.shape[0]].values
-    self.merged.columns = ['county', 'population', 'cases', 'deaths']
+    self.merged.columns = ['county', 'population', 'cases', 'day', 'deaths']
     #self.merged['death_counts'] = self.death_counts.values[:self.merged.shape[0]]
     #self.merged.to_csv(self.merged_path)
     return self.merged
@@ -564,16 +566,16 @@ def has_listed_activities(row):
   return False
 
 
-def compute_diffs(dataframe):
+def compute_diffs(dataframe, Y_value='cases'):
     APPROX_NEG_INFTY=-1e2
     APPROX_POS_INFTY=1e2
     # create deltas
     # can't do this b/c we're computing spurious deltas b/w counties
     dataframe['daily_change'] = np.zeros(dataframe.shape[0])
-    dataframe['daily_change'].iloc[1:] = dataframe['cases'].values[1:] - dataframe['cases'].values[:-1]
+    dataframe['daily_change'].iloc[1:] = dataframe[Y_value].values[1:] - dataframe[Y_value].values[:-1]
     dataframe['daily_change'] = dataframe['daily_change'].fillna(0)
     dataframe['daily_growth_rate'] = np.zeros(dataframe.shape[0])
-    dataframe['daily_growth_rate'].iloc[1:] = (dataframe['cases'].apply(lambda v: 1e-3 if v == 0.0 else v).values[1:] / dataframe['cases'].apply(lambda v: 1e-3 if v == 0.0 else v).values[:-1])
+    dataframe['daily_growth_rate'].iloc[1:] = (dataframe[Y_value].apply(lambda v: 1e-3 if v == 0.0 else v).values[1:] / dataframe[Y_value].apply(lambda v: 1e-3 if v == 0.0 else v).values[:-1])
     dataframe['daily_growth_rate'] = dataframe['daily_growth_rate'].apply(lambda v: 1e-3 if v == 0.0 else v).apply(np.log)
     return dataframe
 
