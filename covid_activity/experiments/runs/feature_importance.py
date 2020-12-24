@@ -13,7 +13,7 @@ if __name__ == '__main__':
     cccpaap_masked = dlake.get_county_case_counts_pop_activity_landarea_policy()
     cccpaap_masked = compute_diffs(cccpaap_masked)
     
-    os.mkdir(os.path.join(DATASET_DIR, '/models/'))
+    os.mkdir(os.path.join(DATASET_DIR, 'models/'))
 
     panel_exp = {}
     models = {}
@@ -43,8 +43,8 @@ if __name__ == '__main__':
                 'train': fi_train, 
                 'test': fi_test, 
             }
-        with open(os.path.join(DATASET_DIR, '/models/', 'feature_importance_test.json'), 'wb') as f:
-            json.dump(model, f)
+        with open(os.path.join(DATASET_DIR, 'models/', 'feature_importance_test.json'), 'wb') as f:
+            pickle.dump(model, f)
     
     with open(os.path.join(DATASET_DIR, 'feature_importance_panel_exp.json'), 'w', encoding='utf-8') as f:
         json.dump(panel_exp, f, indent=4)

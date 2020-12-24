@@ -186,20 +186,57 @@ class C3aiDataLake:
       self.merged = pd.read_csv(self.merged_path)
       return self.merged
     print('merging counties, population, and case counts')
-    self.merged = pd.DataFrame(list(zip(
-                    self.counties['county'].values,
-                    self.population['population'].values, 
-                    self.case_counts.drop('county', axis=1).values,
-                    )))
-    self.merged = self.merged.explode(2) # can only explode a single column not multiple
-    self.merged[3] = pd.DataFrame(list(zip(
-                      self.counties['county'].values,
-                      self.population['population'].values, 
-                      self.death_counts.drop('county', axis=1).values,
-                    ))).explode(2)[2][:self.merged.shape[0]].values
-    self.merged.columns = ['county', 'population', 'cases', 'day', 'deaths']
+    # for c1, c2 in zip(self.counties['county'].values,self.case_counts['county'].values):
+    #   assert c1==c2
+    min_num_days = min(self.case_counts.shape[1], self.death_counts.shape[1])-1
+    self.case_counts['t']  = list(self.case_counts.iloc[:, 1:min_num_days].to_numpy())
+    self.death_counts['t'] = list(self.death_counts.iloc[:, 1:min_num_days].to_numpy())
+    
+    pop = self.get_county_population()
+    counties = pd.merge(
+      how='left', 
+      on='county',
+      left=self.counties,
+      right=pop
+    )
+    
+    a = pd.merge(
+        how='inner',
+        left=counties[['county', 'population']],
+        right=self.case_counts[['county','t']],
+        left_on='county',
+        right_on='county'
+    )
+    b = pd.merge(
+      how='inner',
+      left=self.counties[['county']],
+      right=self.death_counts[['county','t']].iloc[:self.case_counts.shape[0], :],
+      left_on='county',
+      right_on='county'
+    )
+    a = a.explode('t')
+    a = a[a['t'].apply(lambda v: type(v) == float)]
+    b = b.explode('t')
+    b = b[b['t'].apply(lambda v: type(v) == float)]
+    assert a.shape[0] == b.shape[0], f'{a.shape} {b.shape}'
+
+    self.merged= a
+    self.merged['t_2'] = b['t']
+    self.merged.columns = ['county', 'population', 'cases', 'deaths']
+    # self.merged = pd.DataFrame(list(zip(
+    #                 self.counties['county'].values,
+    #                 self.population['population'].values, 
+    #                 self.case_counts.drop('county', axis=1).values,
+    #                 )))
+    # self.merged = self.merged.explode(2) # can only explode a single column not multiple
+    # self.merged[3] = pd.DataFrame(list(zip(
+    #                   self.counties['county'].values,
+    #                   self.population['population'].values, 
+    #                   self.death_counts.drop('county', axis=1).values,
+    #                 ))).explode(2)[2][:self.merged.shape[0]].values
+    #self.merged.columns = ['county', 'population', 'cases']#, 'deaths']
     #self.merged['death_counts'] = self.death_counts.values[:self.merged.shape[0]]
-    #self.merged.to_csv(self.merged_path)
+    self.merged.to_csv(self.merged_path)
     return self.merged
 
                                                       
